@@ -1,0 +1,12 @@
+# environment configs
+.env
+.env.*
+!.env.example
+
+# codex
+.codex/
+.codex-cli/
+
+# misc
+.vscode
+.DS_Store
