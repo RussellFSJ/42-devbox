@@ -1,0 +1,47 @@
+
+name: 42-devbox
+
+x-common: &common
+  platform: ${DOCKER_PLATFORM:-linux/amd64}
+  stdin_open: true
+  tty: true
+
+  volumes:
+    - ${WORKSPACE_DIR:-..}:/workspace
+
+services:
+  42-dev:
+    <<: *common
+
+    image: ${DEV_IMAGE:-42-devbox:dev}
+
+    build:
+      context: .
+      target: dev
+      args: &dev-build-args
+        UBUNTU_VERSION: ${UBUNTU_VERSION:-22.04}
+        GCC_VERSION: ${GCC_VERSION:-12}
+        CLANG_VERSION: ${CLANG_VERSION:-12}
+        NORMINETTE_VERSION: ${NORMINETTE_VERSION:-3.3.60}
+
+  42-codex:
+    <<: *common
+    profiles: [codex]
+
+    image: ${CODEX_IMAGE:-42-devbox:codex}
+
+    build:
+      context: .
+      target: codex
+      args:
+        <<: *dev-build-args
+        NODE_MAJOR: ${NODE_MAJOR:-22}
+        CODEX_VERSION: ${CODEX_VERSION:-0.171.0}
+
+    volumes:
+      - ${WORKSPACE_DIR:-..}:/workspace
+      - codex-data:/root/.codex
+
+volumes:
+  codex-data:
+    name: ${CODEX_VOLUME_NAME:-42-devbox-codex-data}
